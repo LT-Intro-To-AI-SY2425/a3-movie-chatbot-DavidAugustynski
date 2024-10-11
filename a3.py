@@ -18,7 +18,6 @@
 # bye
 
 #  Include the movie database, named movie_db
-from unittest import result
 from movies import movie_db
 from match import match
 from typing import List, Tuple, Callable, Any
@@ -55,17 +54,14 @@ def title_by_year(matches: List[str]) -> List[str]:
     Returns:
         a list of movie titles made in the passed in year
     """
-    year=int(matches[0])
     result = []
-    #print(year)
+    year = int (matches[0])
     for movie in movie_db:
-        # print(get_year[movie])
-        # print(get_title[movie])
         if get_year(movie) == year:
             result.append(get_title(movie))
-            
-    
     return result
+
+        
 
 
 def title_by_year_range(matches: List[str]) -> List[str]:
@@ -81,7 +77,13 @@ def title_by_year_range(matches: List[str]) -> List[str]:
         a list of movie titles made during those years, inclusive (meaning if you pass
         in ["1991", "1994"] you will get movies made in 1991, 1992, 1993 & 1994)
     """
-    pass
+    result = []
+    year = int (matches[0])
+    yeartwo = int(matches[1])
+    for movie in movie_db:
+        if get_year(movie)>=year and get_year(movie)<=yeartwo:
+            result.append(get_title(movie))
+    return result
 
 
 def title_before_year(matches: List[str]) -> List[str]:
@@ -95,7 +97,12 @@ def title_before_year(matches: List[str]) -> List[str]:
         a list of movie titles made before the passed in year, exclusive (meaning if you
         pass in 1992 you won't get any movies made that year, only before)
     """
-    pass
+    result = []
+    year = int (matches[0])
+    for movie in movie_db:
+        if get_year(movie) < year:
+            result.append(get_title(movie))
+    return result
 
 
 def title_after_year(matches: List[str]) -> List[str]:
@@ -109,7 +116,21 @@ def title_after_year(matches: List[str]) -> List[str]:
         a list of movie titles made after the passed in year, exclusive (meaning if you
         pass in 1992 you won't get any movies made that year, only after)
     """
-    pass
+    result = []
+    year = int (matches[0])
+    for movie in movie_db:
+        if get_year(movie) > year:
+            result.append(get_title(movie))
+    return result
+
+def directors_by_year(matches: List[str]) -> List[str]:
+    year= matches[0]
+    result=[]
+    for movie in movie_db:
+        ye=get_year(movie)
+        if ye==year:
+            result.append(get_director(movie))
+    return result
 
 
 def director_by_title(matches: List[str]) -> List[str]:
@@ -121,7 +142,13 @@ def director_by_title(matches: List[str]) -> List[str]:
     Returns:
         a list of 1 string, the director of the movie
     """
-    pass
+    title = matches[0]
+    result = []
+    for movie in movie_db:
+        newT= get_title(movie)
+        if newT == title:
+            result.append(get_director(movie))
+    return result
 
 
 def title_by_director(matches: List[str]) -> List[str]:
@@ -133,7 +160,13 @@ def title_by_director(matches: List[str]) -> List[str]:
     Returns:
         a list of movies titles directed by the passed in director
     """
-    pass
+    result=[]
+    dir = matches[0]
+    for movie in movie_db:
+        curr=get_director(movie)
+        if curr==dir:
+            result.append(get_title(movie))
+    return result
 
 
 def actors_by_title(matches: List[str]) -> List[str]:
@@ -145,7 +178,13 @@ def actors_by_title(matches: List[str]) -> List[str]:
     Returns:
         a list of actors who acted in the passed in title
     """
-    pass
+    title=matches[0]
+    result=[]
+    for movie in movie_db:
+        curr=get_title(movie)
+        if curr==title:
+            result = get_actors(movie)
+    return result
 
 
 def year_by_title(matches: List[str]) -> List[int]:
@@ -157,7 +196,16 @@ def year_by_title(matches: List[str]) -> List[int]:
     Returns:
         a list of one item (an int), the year that the movie was made
     """
-    pass
+    title = matches[0]
+    result =[]
+    for movie in movie_db:
+        curr =get_title(movie)
+        if curr==title:
+            result.append(get_year(movie))
+    return result
+        
+
+
 
 
 def title_by_actor(matches: List[str]) -> List[str]:
@@ -169,8 +217,14 @@ def title_by_actor(matches: List[str]) -> List[str]:
     Returns:
         a list of movie titles that the actor acted in
     """
-    pass
+    result=[]
+    actor=matches[0]
+    for movie in movie_db:
+        if actor in get_actors(movie):
+            result.append(get_title(movie))
+    return result
 
+ 
 
 # dummy argument is ignored and doesn't matter
 def bye_action(dummy: List[str]) -> None:
@@ -184,6 +238,7 @@ pa_list: List[Tuple[List[str], Callable[[List[str]], List[Any]]]] = [
     (str.split("what movies were made between _ and _"), title_by_year_range),
     (str.split("what movies were made before _"), title_before_year),
     (str.split("what movies were made after _"), title_after_year),
+    (str.split("who directed in _"), directors_by_year),
     # note there are two valid patterns here two different ways to ask for the director
     # of a movie
     (str.split("who directed %"), director_by_title),
@@ -208,7 +263,26 @@ def search_pa_list(src: List[str]) -> List[str]:
         a list of answers. Will be ["I don't understand"] if it finds no matches and
         ["No answers"] if it finds a match but no answers
     """
-    pass
+    
+    for pattern, action in pa_list:
+        mat= match(pattern,src)
+        if mat!=None:
+            result = (action(mat))
+            if result:
+                return result
+            return ["No answers"]
+        
+        
+        
+            
+    return ["I don't understand"]
+    
+
+    
+
+
+    
+
 
 
 def query_loop() -> None:
@@ -233,7 +307,7 @@ def query_loop() -> None:
 # uncomment the following line once you've written all of your code and are ready to try
 # it out. Before running the following line, you should make sure that your code passes
 # the existing asserts.
-# query_loop()
+query_loop()
 
 if __name__ == "__main__":
     assert isinstance(title_by_year(["1974"]), list), "title_by_year not returning a list"
@@ -276,35 +350,27 @@ if __name__ == "__main__":
             "murray hamilton",
         ]
     ), "failed actors_by_title test"
-
-    assert isinstance(year_by_title(["jaws"]), list), "year_by_title not returning a list"
     assert sorted(actors_by_title(["movie not in database"])) == [], "failed actors_by_title not in database test"
 
-    assert isinstance(title_by_actor(["orson welles"]), list), "title_by_actor not returning a list"
+    assert isinstance(year_by_title(["jaws"]), list), "year_by_title not returning a list"
     assert sorted(year_by_title(["jaws"])) == sorted(
         [1975]
     ), "failed year_by_title test"
-    76
-    
-   
-    
-    
-    
-    
-   
-   
-    
+
+    assert isinstance(title_by_actor(["orson welles"]), list), "title_by_actor not returning a list"
     assert sorted(title_by_actor(["orson welles"])) == sorted(
         ["citizen kane", "othello"]
     ), "failed title_by_actor test"
+    
+     
+   
     assert sorted(search_pa_list(["hi", "there"])) == sorted(
         ["I don't understand"]
     ), "failed search_pa_list test 1"
     assert sorted(search_pa_list(["who", "directed", "jaws"])) == sorted(
         ["steven spielberg"]
     ), "failed search_pa_list test 2"
-    assert sorted(
-        search_pa_list(["what", "movies", "were", "made", "in", "2020"])
+    assert sorted(search_pa_list(["what", "movies", "were", "made", "in", "2020"])
     ) == sorted(["No answers"]), "failed search_pa_list test 3"
 
     print("All tests passed!")
